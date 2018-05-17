@@ -1,0 +1,54 @@
+name: kong
+version: '0.1'
+summary: Microservice API gateway
+description: |
+  Microservice API gateway
+
+grade: devel
+confinement: devmode
+
+apps:
+  kong:
+    command: bin/kong
+
+parts:
+  openresty:
+    plugin: make
+    build-packages: 
+      - build-essential
+      - libpcre3-dev
+      - libssl-dev
+    source: https://openresty.org/download/openresty-1.11.2.5.tar.gz
+    override-build: |
+      # configure options here from https://getkong.org/install/source/
+      ./configure \
+        --with-pcre-jit \
+        --with-ipv6 \
+        --with-http_realip_module \
+        --with-http_ssl_module \
+        --with-http_stub_status_module \
+        --with-http_v2_module
+      make install
+  luarocks:
+    after: [openresty]
+    plugin: make
+    source: https://github.com/luarocks/luarocks.git
+    source-tag: 2.2.3
+    source-depth: 1
+    override-build: |
+      ./configure \
+        --lua-suffix=jit \
+        --with-lua=/usr/local/openresty/luajit \
+        --with-lua-include=/usr/local/openresty/luajit/include/luajit-2.1
+      make build
+      make install
+  kong:
+    after: [luarocks]
+    source: https://github.com/kong/kong.git  
+    plugin: nil
+    build-packages: 
+      - unzip
+    override-build: |
+      luarocks install kong 0.13.1-0
+      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
+      cp bin/kong $SNAPCRAFT_PART_INSTALL/bin/kong
