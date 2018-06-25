@@ -10,6 +10,8 @@ confinement: devmode
 apps:
   kong:
     command: bin/kong
+    plugs:
+      - network-bind
 
 parts:
   openresty:
