@@ -50,6 +50,7 @@ parts:
     source-depth: 1
     stage-packages:
       - luarocks
+      - libfindbin-libs-perl
     build-packages: 
       - unzip
       - luarocks
