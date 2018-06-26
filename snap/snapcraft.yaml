@@ -16,6 +16,7 @@ apps:
 parts:
   openresty:
     plugin: autotools
+    source: https://openresty.org/download/openresty-1.11.2.5.tar.gz
     install-via: prefix
     # configure options here from https://getkong.org/install/source/
     configflags:
@@ -34,9 +35,7 @@ parts:
     stage-packages:
       - perl
       - libfindbin-libs-perl
-    source: https://openresty.org/download/openresty-1.11.2.5.tar.gz
     override-build: |
-      # do normal build and copy it into stage
       snapcraftctl build
       # openresty will make an absolute symbolic link of openresty to the nginx binary, so we need to clean that up to be relative
       cd $SNAPCRAFT_PART_INSTALL/bin
@@ -48,12 +47,12 @@ parts:
     plugin: nil
     source-tag: 0.13.1
     source-depth: 1
-    stage-packages:
-      - luarocks
-      - libfindbin-libs-perl
     build-packages: 
       - unzip
       - luarocks
+    stage-packages:
+      - luarocks
+      - perl
     override-build: |
       luarocks install --tree=$SNAPCRAFT_PART_INSTALL kong 0.13.1-0
       mkdir -p $SNAPCRAFT_PART_INSTALL/bin
