@@ -51,6 +51,7 @@ parts:
       cd $SNAPCRAFT_PART_INSTALL/bin
       rm -rf openresty
       ln -s ../nginx/sbin/nginx openresty
+      ln -s ../nginx/sbin/nginx nginx
   kong:
     after: [openresty]
     source: https://github.com/kong/kong.git  
