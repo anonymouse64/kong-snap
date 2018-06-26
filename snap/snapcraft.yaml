@@ -57,10 +57,10 @@ parts:
     source-depth: 1
     build-packages: 
       - unzip
-      - luarocks
     stage-packages:
       - luarocks
     override-build: |
+      apt update && apt install -y -qq luarocks
       luarocks install --tree=$SNAPCRAFT_PART_INSTALL kong 0.13.1-0
       mkdir -p $SNAPCRAFT_PART_INSTALL/bin
       cp bin/kong $SNAPCRAFT_PART_INSTALL/bin/kong
