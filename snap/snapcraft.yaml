@@ -55,7 +55,6 @@ parts:
       - luarocks
     stage-packages:
       - luarocks
-      - perl
     override-build: |
       luarocks install --tree=$SNAPCRAFT_PART_INSTALL kong 0.13.1-0
       mkdir -p $SNAPCRAFT_PART_INSTALL/bin
