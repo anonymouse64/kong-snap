@@ -66,3 +66,8 @@ parts:
       luarocks install --tree=$SNAPCRAFT_PART_INSTALL kong 0.13.1-0
       mkdir -p $SNAPCRAFT_PART_INSTALL/bin
       cp bin/kong $SNAPCRAFT_PART_INSTALL/bin/kong
+      # make all the things inside the cmd directory executable because they for some reason aren't executable by default...
+      cd $SNAPCRAFT_PART_INSTALL/share/lua/5.1/kong/cmd
+      for cmd in $(ls *.lua); do
+        chmod +x $cmd
+      done
