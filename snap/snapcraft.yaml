@@ -18,6 +18,11 @@ apps:
       - network-bind
 
 parts:
+  config:
+    source: .
+    plugin: dump
+    prime:
+      - config/kong.snap.conf
   openresty:
     plugin: autotools
     source: https://openresty.org/download/openresty-1.11.2.5.tar.gz
