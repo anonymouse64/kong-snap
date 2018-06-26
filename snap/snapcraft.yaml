@@ -13,7 +13,7 @@ apps:
     environment:
       PERL5LIB: ${SNAP}/usr/local/lib/x86_64-linux-gnu/perl/5.22.1:${SNAP}/usr/local/share/perl/5.22.1:${SNAP}/usr/lib/x86_64-linux-gnu/perl5/5.22:${SNAP}/usr/share/perl5:${SNAP}/usr/lib/x86_64-linux-gnu/perl/5.22:${SNAP}/usr/share/perl/5.22:${SNAP}/usr/local/lib/site_perl:${SNAP}/usr/lib/x86_64-linux-gnu/perl-base
       LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/luajit/lib
-      LUA_PATH: ${SNAP}/lualib/?.lua;${SNAP}/usr/share/lua/5.1/luarocks/?.lua;;
+      LUA_PATH: ${SNAP}/lualib/?.lua;${SNAP}/usr/share/lua/5.1/?.lua;${SNAP}/usr/share/lua/5.1/luarocks/?.lua;;
     plugs:
       - network-bind
 
