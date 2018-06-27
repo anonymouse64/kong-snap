@@ -9,23 +9,17 @@ confinement: strict
 
 apps:
   kong:
-    command: bin/kong
-    environment:
-      PERL5LIB: ${SNAP}/usr/local/lib/x86_64-linux-gnu/perl/5.22.1:${SNAP}/usr/local/share/perl/5.22.1:${SNAP}/usr/lib/x86_64-linux-gnu/perl5/5.22:${SNAP}/usr/share/perl5:${SNAP}/usr/lib/x86_64-linux-gnu/perl/5.22:${SNAP}/usr/share/perl/5.22:${SNAP}/usr/local/lib/site_perl:${SNAP}/usr/lib/x86_64-linux-gnu/perl-base
-      LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:${SNAP}/luajit/lib
-      LUA_PATH: ${SNAP}/lualib/?.lua;${SNAP}/lualib/?/init.lua;${SNAP}/usr/share/lua/5.1/?.lua;${SNAP}/usr/share/lua/5.1/?/init.lua;${SNAP}/lib/lua/5.1/?.lua;${SNAP}/lib/lua/5.1/?/init.lua;${SNAP}/share/lua/5.1/?.lua;${SNAP}/share/lua/5.1/?/init.lua;;
-      LUA_CPATH: ${SNAP}/lualib/?.so;${SNAP}/lib/lua/5.1/?.so;${SNAP}/lib/x86_64-linux-gnu/lua/5.1/?.so;;
-      LANGUAGE: en_US.utf8
-      LC_ALL: en_US.UTF-8
+    command: bin/kong-wrapper.sh
     plugs:
       - network-bind
 
 parts:
-  config:
+  scripts:
     source: .
     plugin: dump
     prime:
       - config/kong.snap.conf
+      - bin/kong-wrapper.sh
   openresty:
     plugin: autotools
     source: https://openresty.org/download/openresty-1.11.2.5.tar.gz
