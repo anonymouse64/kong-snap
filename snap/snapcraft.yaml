@@ -55,6 +55,8 @@ parts:
     source-depth: 1
     build-packages: 
       - unzip
+      - openssl-devel
+      - pcre-devel
     stage-packages:
       - luarocks
     override-build: |
