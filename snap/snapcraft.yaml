@@ -61,7 +61,16 @@ parts:
       - luarocks
     override-build: |
       apt update && apt install -y -qq luarocks
-      luarocks install --tree=$SNAPCRAFT_PART_INSTALL kong 0.13.1-0
+
+      export ARCH=`arch`
+      if [ $ARCH = "x86_64" ] || [ $ARCH = "i386" ] ; then
+        luarocks install --tree=$SNAPCRAFT_PART_INSTALL kong 0.13.1-0
+      elif [ $ARCH = "armhf" ] ; then
+        luarocks install --tree=$SNAPCRAFT_PART_INSTALL kong 0.13.1-0 OPENSSL_LIBDIR=/usr/lib/arm-linux-gnueabihf OPENSSL_INCDIR=/usr/include/
+      elif [ $ARCH = "aarch64" ] ; then
+        luarocks install --tree=$SNAPCRAFT_PART_INSTALL kong 0.13.1-0 OPENSSL_LIBDIR=/usr/lib/aarch64-linux-gnu OPENSSL_INCDIR=/usr/include/
+      fi
+      
       mkdir -p $SNAPCRAFT_PART_INSTALL/bin
       cp bin/kong $SNAPCRAFT_PART_INSTALL/bin/kong
       # make all the things inside the cmd directory executable because they for some reason aren't executable by default...
