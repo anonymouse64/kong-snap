@@ -56,15 +56,18 @@ parts:
     build-packages:
       - libssl-dev
     override-build: |
-      export ARCH=$(arch)
-      echo "running on $ARCH"
-      if [ $ARCH = "x86_64" ] || [ $ARCH = "i386" ] ; then
-        luarocks make --tree=$SNAPCRAFT_STAGE
-      elif [ $ARCH = "armhf" ] ; then
-        luarocks make --tree=$SNAPCRAFT_STAGE OPENSSL_LIBDIR=/usr/lib/arm-linux-gnueabihf OPENSSL_INCDIR=/usr/include/
-      elif [ $ARCH = "aarch64" ] ; then
+      ARCH=$(uname -m)
+      case $ARCH in
+      aarch64)
         luarocks make --tree=$SNAPCRAFT_STAGE OPENSSL_LIBDIR=/usr/lib/aarch64-linux-gnu OPENSSL_INCDIR=/usr/include/
-      fi
+        ;;
+      arm*)
+        luarocks make --tree=$SNAPCRAFT_STAGE OPENSSL_LIBDIR=/usr/lib/arm-linux-gnueabihf OPENSSL_INCDIR=/usr/include/
+        ;;
+      *)
+        luarocks make --tree=$SNAPCRAFT_STAGE
+        ;;
+      esac
 
   luarocks:
     plugin: nil
@@ -86,16 +89,7 @@ parts:
     stage-packages:
       - luarocks
     override-build: |
-      
-
-      export ARCH=`arch`
-      if [ $ARCH = "x86_64" ] || [ $ARCH = "i386" ] ; then
-        luarocks install --tree=$SNAPCRAFT_STAGE kong 0.13.1-0
-      elif [ $ARCH = "armhf" ] ; then
-        luarocks install --tree=$SNAPCRAFT_STAGE kong 0.13.1-0 OPENSSL_LIBDIR=/usr/lib/arm-linux-gnueabihf OPENSSL_INCDIR=/usr/include/
-      elif [ $ARCH = "aarch64" ] ; then
-        luarocks install --tree=$SNAPCRAFT_STAGE kong 0.13.1-0 OPENSSL_LIBDIR=/usr/lib/aarch64-linux-gnu OPENSSL_INCDIR=/usr/include/
-      fi
+      luarocks install --tree=$SNAPCRAFT_STAGE kong 0.13.1-0
       
       mkdir -p $SNAPCRAFT_STAGE/bin
       cp bin/kong $SNAPCRAFT_STAGE/bin/kong
