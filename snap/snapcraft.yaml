@@ -47,6 +47,15 @@ parts:
       rm -rf openresty
       ln -s ../nginx/sbin/nginx openresty
       ln -s ../nginx/sbin/nginx nginx
+  openssl:
+    source: https://github.com/openssl/openssl.git
+    source-tag: OpenSSL_1_1_0f
+    source-depth: 1
+    plugin: nil
+    override-build: |
+      ./config --prefix $SNAPCRAFT_PART_INSTALL
+      make
+      make install
   kong:
     after: [openresty]
     source: https://github.com/kong/kong.git  
@@ -55,7 +64,6 @@ parts:
     source-depth: 1
     build-packages: 
       - unzip
-      - libssl-dev
       - libpcre3-dev
     stage-packages:
       - luarocks
@@ -63,13 +71,8 @@ parts:
       apt update && apt install -y -qq luarocks
 
       export ARCH=`arch`
-      if [ $ARCH = "x86_64" ] || [ $ARCH = "i386" ] ; then
-        luarocks install --tree=$SNAPCRAFT_PART_INSTALL kong 0.13.1-0
-      elif [ $ARCH = "armhf" ] ; then
-        luarocks install --tree=$SNAPCRAFT_PART_INSTALL kong 0.13.1-0 OPENSSL_LIBDIR=/usr/lib/arm-linux-gnueabihf OPENSSL_INCDIR=/usr/include/
-      elif [ $ARCH = "aarch64" ] ; then
-        luarocks install --tree=$SNAPCRAFT_PART_INSTALL kong 0.13.1-0 OPENSSL_LIBDIR=/usr/lib/aarch64-linux-gnu OPENSSL_INCDIR=/usr/include/
-      fi
+      echo "running on $ARCH"
+      luarocks install --tree=$SNAPCRAFT_PART_INSTALL kong 0.13.1-0 OPENSSL_DIR=$SNAPCRAFT_PART_INSTALL
       
       mkdir -p $SNAPCRAFT_PART_INSTALL/bin
       cp bin/kong $SNAPCRAFT_PART_INSTALL/bin/kong
