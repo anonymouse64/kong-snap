@@ -105,3 +105,6 @@ parts:
       for cmd in $(ls *.lua); do
         chmod +x $cmd
       done
+
+      # install everything from stage into the part install for kong
+      cp -r $SNAPCRAFT_STAGE/* $SNAPCRAFT_PART_INSTALL/
