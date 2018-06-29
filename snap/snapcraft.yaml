@@ -47,8 +47,34 @@ parts:
       rm -rf openresty
       ln -s ../nginx/sbin/nginx openresty
       ln -s ../nginx/sbin/nginx nginx
+  luasec:
+    after: [luarocks]
+    source: https://github.com/limadm/luasec.git
+    source-tag: luasec-0.6
+    source-depth: 1
+    plugin: nil
+    build-packages:
+      - libssl-dev
+    override-build: |
+      export ARCH=$(arch)
+      echo "running on $ARCH"
+      if [ $ARCH = "x86_64" ] || [ $ARCH = "i386" ] ; then
+        luarocks make --tree=$SNAPCRAFT_STAGE
+      elif [ $ARCH = "armhf" ] ; then
+        luarocks make --tree=$SNAPCRAFT_STAGE OPENSSL_LIBDIR=/usr/lib/arm-linux-gnueabihf OPENSSL_INCDIR=/usr/include/
+      elif [ $ARCH = "aarch64" ] ; then
+        luarocks make --tree=$SNAPCRAFT_STAGE OPENSSL_LIBDIR=/usr/lib/aarch64-linux-gnu OPENSSL_INCDIR=/usr/include/
+      fi
+
+  luarocks:
+    plugin: nil
+    override-build: |
+      apt update && apt install -y -qq luarocks
   kong:
-    after: [openresty]
+    after: 
+      - openresty
+      - luarocks
+      - luasec
     source: https://github.com/kong/kong.git  
     plugin: nil
     source-tag: 0.13.1
@@ -60,21 +86,21 @@ parts:
     stage-packages:
       - luarocks
     override-build: |
-      apt update && apt install -y -qq luarocks
+      
 
       export ARCH=`arch`
       if [ $ARCH = "x86_64" ] || [ $ARCH = "i386" ] ; then
-        luarocks install --tree=$SNAPCRAFT_PART_INSTALL kong 0.13.1-0
+        luarocks install --tree=$SNAPCRAFT_STAGE kong 0.13.1-0
       elif [ $ARCH = "armhf" ] ; then
-        luarocks install --tree=$SNAPCRAFT_PART_INSTALL kong 0.13.1-0 OPENSSL_LIBDIR=/usr/lib/arm-linux-gnueabihf OPENSSL_INCDIR=/usr/include/
+        luarocks install --tree=$SNAPCRAFT_STAGE kong 0.13.1-0 OPENSSL_LIBDIR=/usr/lib/arm-linux-gnueabihf OPENSSL_INCDIR=/usr/include/
       elif [ $ARCH = "aarch64" ] ; then
-        luarocks install --tree=$SNAPCRAFT_PART_INSTALL kong 0.13.1-0 OPENSSL_LIBDIR=/usr/lib/aarch64-linux-gnu OPENSSL_INCDIR=/usr/include/
+        luarocks install --tree=$SNAPCRAFT_STAGE kong 0.13.1-0 OPENSSL_LIBDIR=/usr/lib/aarch64-linux-gnu OPENSSL_INCDIR=/usr/include/
       fi
       
-      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
-      cp bin/kong $SNAPCRAFT_PART_INSTALL/bin/kong
+      mkdir -p $SNAPCRAFT_STAGE/bin
+      cp bin/kong $SNAPCRAFT_STAGE/bin/kong
       # make all the things inside the cmd directory executable because they for some reason aren't executable by default...
-      cd $SNAPCRAFT_PART_INSTALL/share/lua/5.1/kong/cmd
+      cd $SNAPCRAFT_STAGE/share/lua/5.1/kong/cmd
       for cmd in $(ls *.lua); do
         chmod +x $cmd
       done
