@@ -47,37 +47,9 @@ parts:
       rm -rf openresty
       ln -s ../nginx/sbin/nginx openresty
       ln -s ../nginx/sbin/nginx nginx
-  luasec:
-    after: [luarocks]
-    source: https://github.com/limadm/luasec.git
-    source-tag: luasec-0.6
-    source-depth: 1
-    plugin: nil
-    build-packages:
-      - libssl-dev
-    override-build: |
-      ARCH=$(uname -m)
-      case $ARCH in
-      aarch64)
-        luarocks make --tree=$SNAPCRAFT_STAGE OPENSSL_LIBDIR=/usr/lib/aarch64-linux-gnu OPENSSL_INCDIR=/usr/include/
-        ;;
-      arm*)
-        luarocks make --tree=$SNAPCRAFT_STAGE OPENSSL_LIBDIR=/usr/lib/arm-linux-gnueabihf OPENSSL_INCDIR=/usr/include/
-        ;;
-      *)
-        luarocks make --tree=$SNAPCRAFT_STAGE
-        ;;
-      esac
-
-  luarocks:
-    plugin: nil
-    override-build: |
-      apt update && apt install -y -qq luarocks
   kong:
     after: 
       - openresty
-      - luarocks
-      - luasec
     source: https://github.com/kong/kong.git  
     plugin: nil
     source-tag: 0.13.1
@@ -89,7 +61,30 @@ parts:
     stage-packages:
       - luarocks
     override-build: |
-      luarocks install --tree=$SNAPCRAFT_STAGE kong 0.13.1-0
+      # install luarocks first
+      apt update && apt install -y -qq luarocks
+      # handle the location of openssl + libcrypto by architecture
+      # cause luarocks is silly and hardcodes /usr/lib/x86_64-linux-gnu as the lib search path
+      ARCH=$(uname -m)
+      case $ARCH in
+      aarch64)
+        luarocks install --tree=$SNAPCRAFT_STAGE kong 0.13.1-0
+          CRYPTO_LIBDIR=/usr/lib/aarch64-linux-gnu \
+          CRYPTO_INCDIR=/usr/include \
+          OPENSSL_LIBDIR=/usr/lib/aarch64-linux-gnu \
+          OPENSSL_INCDIR=/usr/include
+        ;;
+      arm*)
+        luarocks install --tree=$SNAPCRAFT_STAGE kong 0.13.1-0
+          CRYPTO_LIBDIR=/usr/lib/arm-linux-gnueabihf \
+          CRYPTO_INCDIR=/usr/include \
+          OPENSSL_LIBDIR=/usr/lib/arm-linux-gnueabihf \
+          OPENSSL_INCDIR=/usr/include
+        ;;
+      *)
+        luarocks install --tree=$SNAPCRAFT_STAGE kong 0.13.1-0
+        ;;
+      esac
       
       mkdir -p $SNAPCRAFT_STAGE/bin
       cp bin/kong $SNAPCRAFT_STAGE/bin/kong
