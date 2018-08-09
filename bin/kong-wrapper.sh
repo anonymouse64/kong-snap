@@ -31,4 +31,7 @@ export LUA_VERSION=5.1
 export LUA_PATH="$SNAP/lualib/?.lua;$SNAP/lualib/?/init.lua;$SNAP/usr/share/lua/$LUA_VERSION/?.lua;$SNAP/usr/share/lua/$LUA_VERSION/?/init.lua;$SNAP/lib/lua/$LUA_VERSION/?.lua;$SNAP/lib/lua/$LUA_VERSION/?/init.lua;$SNAP/share/lua/$LUA_VERSION/?.lua;$SNAP/share/lua/$LUA_VERSION/?/init.lua;;"
 export LUA_CPATH="$SNAP/lualib/?.so;$SNAP/lib/lua/$LUA_VERSION/?.so;$SNAP/lib/$archLibName/lua/$LUA_VERSION/?.so;;"
 
+export LC_ALL=C.UTF-8
+export LANG=C.UTF-8
+
 exec "$SNAP/bin/kong" "$@"
