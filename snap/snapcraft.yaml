@@ -44,8 +44,6 @@ parts:
       - libssl-dev
     stage-packages:
       - perl
-    override-build: |
-      snapcraftctl build
   luarocks:
     after: [lua]
     plugin: autotools
