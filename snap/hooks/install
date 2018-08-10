@@ -1,7 +1,18 @@
 #!/bin/bash -e
 
-# check if the config file exists
-if [ ! -f "$SNAP_DATA/config/kong.conf" ]; then
-    mkdir -p $SNAP_DATA/config
-    cp $SNAP/config/kong.snap.conf $SNAP_DATA/config/kong.conf
+# the kong config file needs to be generated with 3 changes from the default one included in the snap
+# - we set the prefix to be $SNAP_DATA/kong as an absolute path (note that this has to be done here in the install hook)
+# - we set the nginx user to be root
+# - we set the database used to cassandra
+if [ ! -f "${SNAP_DATA}/config/kong.conf" ]; then
+    cp "${SNAP}/config/kong.conf" "${SNAP_DATA}/config/kong.conf"
+    # replace the default prefix setting with an absolute path using $SNAP_DATA
+    # note that if anyone ever has a "@" in their $SNAP_DATA this will likely fail
+    sed -i "s@#prefix = /usr/local/kong/@prefix = ${SNAP_DATA}/kong@" "${SNAP_DATA}/config/kong.conf"
+
+    # also replace the default nginx user/group to be root
+    sed -i "s@#nginx_user = nobody nobody@nginx_user = root root@" "${SNAP_DATA}/config/kong.conf"
+
+    # finally set the make database to be cassandra
+    sed -i "s@#database = postgres@database = cassandra@" "${SNAP_DATA}/config/kong.conf"
 fi
