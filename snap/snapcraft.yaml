@@ -20,7 +20,6 @@ parts:
     source: .
     plugin: dump
     prime:
-      - config/kong.snap.conf
       - bin/kong-wrapper.sh
   openresty:
     plugin: autotools
