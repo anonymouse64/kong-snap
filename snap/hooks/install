@@ -5,6 +5,7 @@
 # - we set the nginx user to be root
 # - we set the database used to cassandra
 if [ ! -f "${SNAP_DATA}/config/kong.conf" ]; then
+    mkdir -p "${SNAP_DATA}/config"
     cp "${SNAP}/config/kong.conf" "${SNAP_DATA}/config/kong.conf"
     # replace the default prefix setting with an absolute path using $SNAP_DATA
     # note that if anyone ever has a "@" in their $SNAP_DATA this will likely fail
