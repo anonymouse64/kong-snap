@@ -8,7 +8,7 @@ if [ ! -f "${SNAP_DATA}/config/kong.conf" ]; then
     cp "${SNAP}/config/kong.conf" "${SNAP_DATA}/config/kong.conf"
     # replace the default prefix setting with an absolute path using $SNAP_DATA
     # note that if anyone ever has a "@" in their $SNAP_DATA this will likely fail
-    sed -i "s@#prefix = /usr/local/kong/@prefix = ${SNAP_DATA}/kong@" "${SNAP_DATA}/config/kong.conf"
+    sed -i "s@#prefix = /usr/local/kong/@prefix = ${SNAP_DATA}@" "${SNAP_DATA}/config/kong.conf"
 
     # also replace the default nginx user/group to be root
     sed -i "s@#nginx_user = nobody nobody@nginx_user = root root@" "${SNAP_DATA}/config/kong.conf"
