@@ -48,13 +48,34 @@ parts:
       - --with-http_stub_status_module
       - --with-http_v2_module
     build-packages: 
-      - build-essential
-      - libpcre3-dev
-      - perl
-      - curl
-      - libssl-dev
+      - to armhf:
+        - "build-essential:armhf"
+        - "libpcre3-dev:armhf"
+        - "perl:armhf"
+        - "curl:armhf"
+        - "libssl-dev:armhf"
+      - to arm64:
+        - "build-essential:arm64"
+        - "libpcre3-dev:arm64"
+        - "perl:arm64"
+        - "curl:arm64"
+        - "libssl-dev:arm64"
+      - to amd64:
+        - "build-essential:amd64"
+        - "libpcre3-dev:amd64"
+        - "perl:amd64"
+        - "curl:amd64"
+        - "libssl-dev:amd64"
     stage-packages:
-      - perl
+      - to armhf:
+        - "perl:armhf"
+        - "libssl:armhf"
+      - to arm64:
+        - "perl:arm64"
+        - "libssl:arm64"
+      - to amd64:
+        - "perl:amd64"
+        - "libssl:amd64"
   luarocks:
     after: [lua]
     plugin: autotools
