@@ -89,17 +89,27 @@ parts:
   lua:
     source: https://www.lua.org/ftp/lua-5.1.5.tar.gz
     source-type: tar
-    plugin: make
-    make-parameters: [linux]
+    plugin: nil
     build-packages:
-      - libreadline-dev
-      - libncurses5-dev
+      - to armhf: 
+        - "libreadline-dev:armhf"
+        - "libncurses5-dev:armhf"
+      - to arm64: 
+        - "libreadline-dev:arm64"
+        - "libncurses5-dev:arm64"
+      - to amd64: 
+        - "libreadline-dev:amd64"
+        - "libncurses5-dev:amd64"
+      - to i386: 
+        - "libreadline-dev:i386"
+        - "libncurses5-dev:i386"
     override-build: |
       # patch the Makefile to use $SNAPCRAFT_STAGE for the INSTALL_TOP variable
       # which unfortunately is not settable using an environment variable and thus needs 
       # this manual patch
       sed -i "s@INSTALL_TOP= /usr/local@INSTALL_TOP=$SNAPCRAFT_STAGE@" Makefile
-      snapcraftctl build
+      make linux install DESTDIR=$SNAPCRAFT_PART_INSTALL
+
   kong:
     after: 
       - openresty
