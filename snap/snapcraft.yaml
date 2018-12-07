@@ -8,6 +8,8 @@ icon: kong-logo.png
 grade: stable
 confinement: strict
 
+architectures: [armhf, arm64, amd64, i386]
+
 apps:
   kong:
     command: bin/kong-wrapper.sh
