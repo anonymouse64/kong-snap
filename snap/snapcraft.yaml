@@ -44,7 +44,7 @@ parts:
   
   openresty:
     plugin: autotools
-    source: https://openresty.org/download/openresty-1.11.2.5.tar.gz
+    source: https://openresty.org/download/openresty-1.15.8.1rc1.tar.gz
     install-via: prefix
     # configure options here from https://getkong.org/install/source/
     configflags:
@@ -93,7 +93,7 @@ parts:
       - luarocks
     source: https://github.com/kong/kong.git  
     plugin: nil
-    source-tag: 0.13.1
+    source-tag: 1.1.2
     source-depth: 1
     build-packages: 
       - unzip
