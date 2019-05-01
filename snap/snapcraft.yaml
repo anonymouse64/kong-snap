@@ -190,9 +190,9 @@ parts:
       # since we only use cassandra for kong, we severly limit the amount of 
       # RAM that cassandra uses since it's a big of a RAM hog, by default
       # attempting to use half of your RAM for itself...
-      echo "-Xms50M" >> $SNAPCRAFT_PART_INSTALL/etc/cassandra/jvm.options
-      echo "-Xmx100M" >> $SNAPCRAFT_PART_INSTALL/etc/cassandra/jvm.options
-      echo "-Xmn50M" >> $SNAPCRAFT_PART_INSTALL/etc/cassandra/jvm.options
+      echo "-Xms64M" >> $SNAPCRAFT_PART_INSTALL/etc/cassandra/jvm.options
+      echo "-Xmx256M" >> $SNAPCRAFT_PART_INSTALL/etc/cassandra/jvm.options
+      echo "-Xmn64M" >> $SNAPCRAFT_PART_INSTALL/etc/cassandra/jvm.options
     prime:
       # Files from the stage directory to include in the snap.
       - bin/nodetool
