@@ -99,8 +99,10 @@ parts:
       - unzip
       - libssl1.0-dev
       - libpcre3-dev
+      - libyaml-dev
     stage-packages:
       - luarocks
+      - libyaml-dev
     override-build: |
 
       # first copy the default config file provided and install it into $SNAPCRAFT_PART_INSTALL/config
