@@ -4,3 +4,7 @@
 *.snap
 
 *.assert
+prime/
+stage/
+parts/
+squashfs-root/
