@@ -21,6 +21,7 @@ architectures:
 
 apps:
   kong:
+    adapter: full
     command: bin/kong-wrapper.sh
     plugs:
       - network-bind
