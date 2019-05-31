@@ -17,3 +17,8 @@ if [ ! -f "${SNAP_DATA}/config/kong.conf" ]; then
     # finally set the make database to be cassandra
     sed -i "s@#database = postgres@database = cassandra@" "${SNAP_DATA}/config/kong.conf"
 fi
+
+# copy the configuration for luarocks into $SNAP_DATA where it is editable
+# and is also bind mounted on top of /etc/luarocks/config.lua inside the snap
+# mount namespace
+cp "$SNAP/etc/luarocks/config.lua" "$SNAP_DATA/etc/luarocks/config.lua"

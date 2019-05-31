@@ -9,6 +9,10 @@ icon: snap/local/runtime-assets/kong-logo.png
 grade: stable
 confinement: strict
 
+layout:
+  /etc/luarocks:
+    bind: $SNAP_DATA/etc/luarocks
+
 architectures: 
   - build-on: armhf
   - build-on: arm64
