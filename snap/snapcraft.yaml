@@ -1,5 +1,5 @@
 name: kong
-version: '1.0.3'
+version: "1.0.3"
 summary: The Cloud-Native API Gateway
 base: core18
 description: |
@@ -59,7 +59,7 @@ parts:
       - --with-http_ssl_module
       - --with-http_stub_status_module
       - --with-http_v2_module
-    build-packages: 
+    build-packages:
       - build-essential
       - libpcre3-dev
       - perl
@@ -84,11 +84,11 @@ parts:
         resty
 
   kong:
-    source: https://github.com/kong/kong.git  
+    source: https://github.com/kong/kong.git
     plugin: nil
     source-tag: 1.0.3
     source-depth: 1
-    build-packages: 
+    build-packages:
       - unzip
       - libssl1.0-dev
       - libpcre3-dev
@@ -139,7 +139,7 @@ parts:
         exit 1
         ;;
       esac
-      
+
       mkdir -p $SNAPCRAFT_PART_INSTALL/bin
       cp bin/kong $SNAPCRAFT_PART_INSTALL/bin/kong
       # make all the things inside the cmd directory executable because they for some reason aren't executable by default...
