@@ -1,18 +1,25 @@
 #!/bin/bash -e
 
+# get the values of $SNAP_DATA and $SNAP using the current symlink instead of
+# the default behavior which has the revision hard-coded, which breaks after
+# a refresh
+SNAP_DATA_CURRENT=${SNAP_DATA/%$SNAP_REVISION/current}
+SNAP_CURRENT=${SNAP/%$SNAP_REVISION/current}
+
 # the kong config file needs to be generated with 3 changes from the default one included in the snap
 # - we set the prefix to be $SNAP_DATA/kong as an absolute path (note that this has to be done here in the install hook)
 # - we set the nginx user to be root
 # - we set the database used to cassandra
-if [ ! -f "${SNAP_DATA}/config/kong.conf" ]; then
-    mkdir -p "${SNAP_DATA}/config"
-    cp "${SNAP}/config/kong.conf" "${SNAP_DATA}/config/kong.conf"
+if [ ! -f "$SNAP_DATA/config/kong.conf" ]; then
+    mkdir -p "$SNAP_DATA/config"
+    cp "$SNAP/config/kong.conf" "$SNAP_DATA/config/kong.conf"
+
     # replace the default prefix setting with an absolute path using $SNAP_DATA
     # note that if anyone ever has a "@" in their $SNAP_DATA this will likely fail
-    sed -i "s@#prefix = /usr/local/kong/@prefix = ${SNAP_DATA}@" "${SNAP_DATA}/config/kong.conf"
+    sed -i "s@#prefix = /usr/local/kong/@prefix = $SNAP_DATA_CURRENT@" "$SNAP_DATA/config/kong.conf"
 
     # also replace the default nginx user/group to be root
-    sed -i "s@#nginx_user = nobody nobody@nginx_user = root root@" "${SNAP_DATA}/config/kong.conf"
+    sed -i "s@#nginx_user = nobody nobody@nginx_user = root root@" "$SNAP_DATA/config/kong.conf"
 
     # finally set the make database to be cassandra
     sed -i "s@#database = postgres@database = cassandra@" "${SNAP_DATA}/config/kong.conf"
