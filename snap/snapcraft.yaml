@@ -20,6 +20,25 @@ architectures:
   - build-on: i386
 
 apps:
+  kong-daemon:
+    adapter: full
+    after:
+      - cassandra
+    command: bin/kong-daemon.sh
+    daemon: forking
+    environment:
+      KONG_CONF: $SNAP_DATA/config/kong.conf
+      KONG_LOGS_DIR: $SNAP_COMMON/logs
+      KONG_PROXY_ACCESS_LOG: $SNAP_COMMON/logs/kong-proxy-access.log
+      KONG_ADMIN_ACCESS_LOG: $SNAP_COMMON/logs/kong-admin-access.log
+      KONG_PROXY_ERROR_LOG: $SNAP_COMMON/logs/kong-proxy-error.log
+      KONG_ADMIN_ERROR_LOG: $SNAP_COMMON/logs/kong-admin-error.log
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
+    start-timeout: 15m
+    plugs:
+      - network
+      - network-bind
+    stop-command: bin/kong-stop.sh
   kong:
     adapter: full
     command: bin/kong-wrapper.sh
