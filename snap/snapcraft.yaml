@@ -210,8 +210,12 @@ parts:
       ln -s ../nginx/sbin/nginx nginx
       # the openresty build system also hard-codes the path to nginx inside
       # the "resty" binary so we need to change that
+      if [ -z "$SNAPCRAFT_PROJECT_NAME" ]; then
+        echo "SNAPCRAFT_PROJECT_NAME is undefined, snapcraft upstream change?"
+        exit 1
+      fi
       sed -i \
-        -e s@$SNAPCRAFT_PART_INSTALL/nginx/sbin/nginx@/snap/kong/current/nginx/sbin/nginx@ \
+        -e s@$SNAPCRAFT_PART_INSTALL/nginx/sbin/nginx@/snap/$SNAPCRAFT_PROJECT_NAME/current/nginx/sbin/nginx@ \
         resty
 
   kong:
