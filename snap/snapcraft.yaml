@@ -309,10 +309,15 @@ parts:
     source: https://github.com/sergiusens/snapcraft-preload.git
     plugin: cmake
     build-packages:
-      - g++-multilib
-      - gcc-multilib
+      - to arm64:
+          - g++-multilib-arm-linux-gnueabihf
+          - gcc-multilib-arm-linux-gnueabihf
+      - else:
+          - gcc-multilib
+          - g++-multilib
     stage-packages:
-      - lib32stdc++6
+      - to amd64:
+          - lib32stdc++6
   gosu:
     source: https://github.com/tianon/gosu.git
     plugin: go
