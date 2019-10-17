@@ -163,6 +163,9 @@ parts:
       - bin/*
       - etc/*
   openresty:
+    # see comment on kong's after spec for why we order after snapcraft-preload
+    # here
+    after: [snapcraft-preload]
     plugin: autotools
     source: https://openresty.org/download/openresty-1.13.6.2.tar.gz
     install-via: prefix
@@ -199,6 +202,18 @@ parts:
         resty
 
   kong:
+    # order this part after snapcraft-preload because there are include paths
+    # that snapcraft will generate for this parts to auto-include in the
+    # compile options for later parts if the part is C-based (i.e. some deps of
+    # kong), but these include paths will break compiling snapcraft-preload in
+    # very nasty ways
+    # note that it seems only kong breaks snapcraft-preload, but do openresty
+    # too just for good measure until we have a better resolution for this
+    # see also https://github.com/sergiusens/snapcraft-preload/issues/38
+    # ideally this would just be a "before: " on the snapcraft-preload part, but
+    # snapcraft doesn't support that, see
+    # https://bugs.launchpad.net/snapcraft/+bug/1848493
+    after: [snapcraft-preload]
     source: https://github.com/kong/kong.git
     plugin: nil
     source-tag: 1.0.3
@@ -269,6 +284,10 @@ parts:
 
   # snapcraft preload is necessary to make postgres just use a different
   # lockfile location in /dev/shm
+  # NOTE: if this ever breaks in really scary ways when compiling with lots of
+  # warnings, see the comment on the kong part, tldr probably some other C/C++
+  # part in the build broke snapcraft-preload by running before
+  # snapcraft-preload
   snapcraft-preload:
     source: https://github.com/sergiusens/snapcraft-preload.git
     plugin: cmake
