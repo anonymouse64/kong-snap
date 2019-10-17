@@ -162,10 +162,18 @@ parts:
     prime:
       - bin/*
       - etc/*
+  openresty-kong-patches:
+    plugin: dump
+    source: https://github.com/Kong/openresty-patches.git
+    source-depth: 1
+    organize:
+      patches: openresty-kong-patches
+    stage: [openresty-kong-patches]
+    prime: [-*]
   openresty:
     # see comment on kong's after spec for why we order after snapcraft-preload
     # here
-    after: [snapcraft-preload]
+    after: [openresty-kong-patches, snapcraft-preload]
     plugin: autotools
     source: https://openresty.org/download/openresty-1.13.6.2.tar.gz
     install-via: prefix
@@ -187,8 +195,13 @@ parts:
     stage-packages:
       - perl
     override-build: |
+      cd $SNAPCRAFT_PART_SRC/bundle
+      # apply patches from openresty-kong-patches
+      for i in $SNAPCRAFT_STAGE/openresty-kong-patches/1.13.6.2/*.patch; do
+        patch -p1 < $i
+      done
       snapcraftctl build
-      # openresty will make an absolute symbolic link of openresty to the 
+      # openresty will make an absolute symbolic link of openresty to the
       # nginx binary, so we need to delete that and replace it with a relative
       # symlink
       cd $SNAPCRAFT_PART_INSTALL/bin
