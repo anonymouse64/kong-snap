@@ -6,6 +6,9 @@ description: |
   Kong is a cloud-native, fast, scalable, and distributed Microservice Abstraction Layer (also known as an API Gateway, API Middleware or in some cases Service Mesh). Made available as an open-source project in 2015, its core values are high performance and extensibility.
 icon: snap/local/runtime-assets/kong-logo.png
 
+# for system-usernames we need snapd 2.42
+assumes: [snapd2.42]
+
 grade: stable
 confinement: strict
 
@@ -13,7 +16,21 @@ layout:
   /etc/luarocks:
     bind: $SNAP_DATA/etc/luarocks
 
-architectures: 
+passthrough:
+  system-usernames:
+    snap_daemon: shared
+  hooks:
+    install:
+      environment:
+        LC_ALL: C.UTF-8
+        LANG: C.UTF-8
+        PGHOST: $SNAP_COMMON/sockets
+        SNAPCRAFT_PRELOAD_REDIRECT_ONLY_SHM: 1
+      command-chain:
+        - snap/command-chain/snapcraft-runner
+        - bin/snapcraft-preload
+
+architectures:
   - build-on: armhf
   - build-on: arm64
   - build-on: amd64
@@ -23,6 +40,7 @@ apps:
   kong-daemon:
     adapter: full
     after:
+      - postgres
       - cassandra
     command: bin/kong-daemon.sh
     daemon: forking
@@ -47,6 +65,19 @@ apps:
       - network
       - home
       - removable-media
+  postgres:
+    adapter: full
+    command: usr/lib/postgresql/10/bin/postgres -D $SNAP_DATA/postgresql/10/main -c $CONFIG_ARG
+    daemon: simple
+    environment:
+      CONFIG_ARG: config_file=$SNAP_DATA/etc/postgresql/10/main/postgresql.conf
+      SNAPCRAFT_PRELOAD_REDIRECT_ONLY_SHM: 1
+    command-chain:
+      - bin/gosu-snap_daemon.sh
+      - bin/snapcraft-preload
+    plugs:
+      - network
+      - network-bind
   cassandra:
     command: bin/cassandra-wrapper.sh
     daemon: forking
@@ -59,6 +90,61 @@ apps:
       # Needed for checking available space in the data directories
       # (java.io.File.getTotalSpace).
       - mount-observe
+  psql:
+    adapter: full
+    command: usr/bin/psql
+    environment:
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+      PGHOST: $SNAP_COMMON/sockets
+    command-chain:
+      - bin/psql-wrapper.sh
+      # createuser should be run as the snap_daemon user, which is the user
+      # who is initially created as a role with postgres
+      - bin/gosu-snap_daemon.sh
+    plugs:
+      - network
+  # same as psql app, but runs as any user, not snap_daemon
+  psql-any:
+    adapter: full
+    command: usr/bin/psql
+    environment:
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+      PGHOST: $SNAP_COMMON/sockets
+      PSQLRC: $SNAP_USER_COMMON/.psqlrc
+    command-chain:
+      - bin/psql-wrapper.sh
+    plugs:
+      - network
+  createuser:
+    adapter: full
+    command: usr/bin/createuser
+    environment:
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+      PGHOST: $SNAP_COMMON/sockets
+    command-chain:
+      - bin/psql-wrapper.sh
+      # createuser should be run as the snap_daemon user, which is the user
+      # who is initially created as a role with postgres
+      - bin/gosu-snap_daemon.sh
+    plugs:
+      - network
+  createdb:
+    adapter: full
+    command: usr/bin/createdb
+    environment:
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+      PGHOST: $SNAP_COMMON/sockets
+    command-chain:
+      - bin/psql-wrapper.sh
+      # createdb should be run as the snap_daemon user, which is the user
+      # who is initially created as a role with postgres
+      - bin/gosu-snap_daemon.sh
+    plugs:
+      - network
 
 parts:
   scripts:
@@ -66,7 +152,7 @@ parts:
     plugin: dump
     prime:
       - bin/*
-  
+      - etc/*
   openresty:
     plugin: autotools
     source: https://openresty.org/download/openresty-1.13.6.2.tar.gz
@@ -171,6 +257,38 @@ parts:
       # TODO: the json2lua script references $SNAPCRAFT_PART_INSTALL in some 
       # paths it tries to load things from, probably worth fixing that to use
       # $SNAP, etc. but currently json2lua seems unused so not changing it now
+
+  # snapcraft preload is necessary to make postgres just use a different
+  # lockfile location in /dev/shm
+  snapcraft-preload:
+    source: https://github.com/sergiusens/snapcraft-preload.git
+    plugin: cmake
+    build-packages:
+      - g++-multilib
+      - gcc-multilib
+    stage-packages:
+      - lib32stdc++6
+  gosu:
+    source: https://github.com/tianon/gosu.git
+    plugin: go
+    go-importpath: github.com/tianon/gosu
+    build-environment:
+      - CGO_ENABLED: "0"
+  postgres:
+    plugin: nil
+    override-build: |
+      snapcraftctl build
+      # the perl package for postgres hard-codes the bin dir as /usr/lib/postgresql
+      # so we need to prepend that with /snap/postgres/current/ before it will
+      # work
+      sed -i -e \
+        's@our $binroot = \"/usr/lib/postgresql/\"@our $binroot = \"/snap/'$SNAPCRAFT_PROJECT_NAME'/current/usr/lib/postgresql/\";@' \
+        $SNAPCRAFT_PART_INSTALL/usr/share/perl5/PgCommon.pm
+    stage-packages:
+      - postgresql
+      - postgresql-contrib
+      - postgresql-client
+      - perl
   cassandra:
     plugin: dump
     source: http://apache.claz.org/cassandra/3.11.4/apache-cassandra-3.11.4-bin.tar.gz
