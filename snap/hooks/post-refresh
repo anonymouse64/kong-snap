@@ -1,0 +1,5 @@
+#!/bin/sh -e
+
+if [ -e "$SNAP_DATA/disable-cassandra" ]; then
+    snapctl stop --disable "$SNAP_NAME.cassandra"
+fi

@@ -3,6 +3,8 @@
 # this script combined from https://github.com/snapcrafters/cassandra/blob/3df209fafb7b3dd341ec7412be4725d7104c5a54/common
 # and from https://github.com/snapcrafters/cassandra/blob/3df209fafb7b3dd341ec7412be4725d7104c5a54/wrapper-cassandra
 
+rm -f "$SNAP_DATA/disable-cassandra"
+
 if [ -z "$SNAP_COMMON" ]; then
     # https://github.com/snapcore/snapd/commit/da9fa37
     export SNAP_COMMON="$SNAP_DATA/../common"

@@ -31,6 +31,7 @@ apps:
   cassandra:
     command: bin/cassandra-wrapper.sh
     daemon: forking
+    adapter: full
     # mount-observe needs to be manually connected post-install:
     # `sudo snap connect cassandra:mount-observe ubuntu-core:mount-observe`
     plugs:
