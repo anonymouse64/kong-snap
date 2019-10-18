@@ -73,9 +73,10 @@ apps:
     stop-command: bin/kong-stop.sh
   kong:
     adapter: full
-    command: bin/kong-launch.sh $SNAP/bin/kong
+    command: bin/kong
     command-chain:
       - bin/perl5lib-launch.sh
+      - bin/kong-launch.sh
     environment:
       KONG_LOGS_DIR: $SNAP_COMMON/logs
       LC_ALL: C.UTF-8
