@@ -69,6 +69,8 @@ apps:
   kong:
     adapter: full
     command: bin/kong-wrapper.sh
+    environment:
+      KONG_LOGS_DIR: $SNAP_COMMON/logs
     plugs:
       - network-bind
       - network
