@@ -52,6 +52,9 @@ apps:
       - postgres
       - cassandra
     command: bin/kong-daemon.sh
+    command-chain:
+      - bin/perl5lib-launch.sh
+      - bin/kong-launch.sh
     daemon: forking
     environment:
       KONG_CONF: $SNAP_DATA/config/kong.conf
@@ -61,6 +64,8 @@ apps:
       KONG_PROXY_ERROR_LOG: $SNAP_COMMON/logs/kong-proxy-error.log
       KONG_ADMIN_ERROR_LOG: $SNAP_COMMON/logs/kong-admin-error.log
       KONG_ADMIN_LISTEN: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
     start-timeout: 1m
     plugs:
       - network
@@ -68,9 +73,13 @@ apps:
     stop-command: bin/kong-stop.sh
   kong:
     adapter: full
-    command: bin/kong-wrapper.sh
+    command: bin/kong-launch.sh $SNAP/bin/kong
+    command-chain:
+      - bin/perl5lib-launch.sh
     environment:
       KONG_LOGS_DIR: $SNAP_COMMON/logs
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
     plugs:
       - network-bind
       - network
@@ -109,7 +118,7 @@ apps:
       LANG: C.UTF-8
       PGHOST: $SNAP_COMMON/sockets
     command-chain:
-      - bin/psql-wrapper.sh
+      - bin/perl5lib-launch.sh
       # createuser should be run as the snap_daemon user, which is the user
       # who is initially created as a role with postgres
       - bin/gosu-snap_daemon.sh
@@ -125,7 +134,7 @@ apps:
       PGHOST: $SNAP_COMMON/sockets
       PSQLRC: $SNAP_USER_COMMON/.psqlrc
     command-chain:
-      - bin/psql-wrapper.sh
+      - bin/perl5lib-launch.sh
     plugs:
       - network
   createuser:
@@ -136,7 +145,7 @@ apps:
       LANG: C.UTF-8
       PGHOST: $SNAP_COMMON/sockets
     command-chain:
-      - bin/psql-wrapper.sh
+      - bin/perl5lib-launch.sh
       # createuser should be run as the snap_daemon user, which is the user
       # who is initially created as a role with postgres
       - bin/gosu-snap_daemon.sh
@@ -150,7 +159,7 @@ apps:
       LANG: C.UTF-8
       PGHOST: $SNAP_COMMON/sockets
     command-chain:
-      - bin/psql-wrapper.sh
+      - bin/perl5lib-launch.sh
       # createdb should be run as the snap_daemon user, which is the user
       # who is initially created as a role with postgres
       - bin/gosu-snap_daemon.sh
