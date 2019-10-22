@@ -33,7 +33,7 @@ snapctl start --enable "$SNAP_NAME.postgres"
 sleep 2
 
 # add a kong user and database in postgres - note we have to run these through
-# the psql-wrapper scripts to setup env vars properly
-gosu snap_daemon "$SNAP/bin/psql-wrapper.sh" "$SNAP/usr/bin/createuser" kong
-gosu snap_daemon "$SNAP/bin/psql-wrapper.sh" "$SNAP/usr/bin/createdb" kong
+# the perl5lib-launch scripts to setup env vars properly
+gosu snap_daemon "$SNAP/bin/perl5lib-launch.sh" "$SNAP/usr/bin/createuser" kong
+gosu snap_daemon "$SNAP/bin/perl5lib-launch.sh" "$SNAP/usr/bin/createdb" kong
 
