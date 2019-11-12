@@ -196,14 +196,15 @@ parts:
       LICENSE: usr/share/lua-kong-nginx-module/LICENSE
     prime:
       - usr/share/lua-kong-nginx-module/LICENSE
+      - lualib
     override-prime: |
-      # also stage lualib folder into $SNAPCRAFT_PART_INSTALL because that needs
+      # also stage lualib folder into $SNAPCRAFT_STAGE because that needs
       # to end up in the final snap, but we have to stage the other files into a
       # module specific path because the filenames conflict with other modules 
       # that kong builds, so use organize + stage above to put the files into 
-      # the module specific path, then copy lualib into $SNAPCRAFT_PART_INSTALL
+      # the module specific path, then copy lualib into $SNAPCRAFT_STAGE
       # orthogonal to that
-      cp -r $SNAPCRAFT_PART_SRC/lualib $SNAPCRAFT_PART_INSTALL/
+      cp -r $SNAPCRAFT_PART_SRC/lualib $SNAPCRAFT_STAGE/
       snapcraftctl prime
 
   openresty:
