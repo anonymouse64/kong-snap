@@ -196,7 +196,7 @@ parts:
       LICENSE: usr/share/lua-kong-nginx-module/LICENSE
     prime:
       - usr/share/lua-kong-nginx-module/LICENSE
-      - lualib
+      - lualib/*
     override-prime: |
       # also stage lualib folder into $SNAPCRAFT_STAGE because that needs
       # to end up in the final snap, but we have to stage the other files into a
