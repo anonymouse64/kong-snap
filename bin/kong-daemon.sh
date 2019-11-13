@@ -1,15 +1,5 @@
 #!/bin/bash -e
 
-# this is a workaround to prevent kong from running on arm64 until kong 
-# upstream supports running on arm64 properly, see 
-# https://github.com/edgexfoundry/blackbox-testing/issues/185 for more details
-# also note that we disable kong from the install hook, but that is only
-# valid on first install, any refreshes will trigger it to be restarted due to
-# https://bugs.launchpad.net/snapd/+bug/1818306 , hence this workaround
-if [ "$SNAP_ARCH" = "arm64" ]; then
-  exit 0
-fi
-
 # run kong migrations up to bootstrap the cassandra database
 # note that sometimes cassandra can be in a "starting up" state, etc.
 # and in this case we should just loop and keep trying
