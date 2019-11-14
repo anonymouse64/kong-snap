@@ -184,28 +184,24 @@ parts:
     prime: [-*]
   lua-kong-nginx-module:
     source: https://github.com/Kong/lua-kong-nginx-module.git
-    plugin: dump
-    stage:
-      - lua-kong-nginx-module
-      - usr
-    organize:
-      lualib: lua-kong-nginx-module/lualib
-      src: lua-kong-nginx-module/src
-      config: lua-kong-nginx-module/config
-      Makefile: lua-kong-nginx-module/Makefile
-      LICENSE: usr/share/lua-kong-nginx-module/LICENSE
-    prime:
-      - usr/share/lua-kong-nginx-module/LICENSE
-      - lualib/*
-    override-prime: |
-      # also stage lualib folder into $SNAPCRAFT_STAGE because that needs
-      # to end up in the final snap, but we have to stage the other files into a
-      # module specific path because the filenames conflict with other modules 
-      # that kong builds, so use organize + stage above to put the files into 
-      # the module specific path, then copy lualib into $SNAPCRAFT_STAGE
-      # orthogonal to that
-      cp -r $SNAPCRAFT_PART_SRC/lualib $SNAPCRAFT_STAGE/
-      snapcraftctl prime
+    source-tag: 0.0.4
+    plugin: nil
+    override-build: |
+      # install the static lualib dir into the final snap, the compiled parts
+      # will be installed into the snap as part of the OpenResty part build
+      mkdir -p $SNAPCRAFT_PART_INSTALL/lualib/resty/kong
+      cp -r $SNAPCRAFT_PART_SRC/lualib/resty/kong/tls.lua $SNAPCRAFT_PART_INSTALL/lualib/resty/kong/tls.lua
+
+      # copy the necessary soruce files from here into a module specific dir in
+      # $SNAPCRAFT_STAGE because some of these files such as config conflict 
+      # with files that Kong generates/needs, so we want these to be in their
+      # own dir for OpenResty to compile with
+      mkdir -p $SNAPCRAFT_STAGE/lua-kong-nginx-module
+      for f in lualib src config Makefile; do
+        cp -r "$SNAPCRAFT_PART_SRC/$f" "$SNAPCRAFT_STAGE/lua-kong-nginx-module/$f"
+      done
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/lua-kong-nginx-module
+      cp LICENSE $SNAPCRAFT_PART_INSTALL/usr/share/lua-kong-nginx-module/LICENSE
 
   openresty:
     # see comment on kong's after spec for why we order after snapcraft-preload
