@@ -9,6 +9,10 @@ icon: snap/local/runtime-assets/kong-logo.png
 # for system-usernames we need snapd 2.42
 assumes: [snapd2.42]
 
+# epoch 0 is for the old 0.13.1 version of the snap with cassandra
+# epoch 1 is for the 1.3 version of the snap with both cassandra and postgres
+epoch: 1
+
 grade: stable
 confinement: strict
 
