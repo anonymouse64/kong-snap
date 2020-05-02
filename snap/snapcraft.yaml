@@ -1,5 +1,5 @@
 name: kong
-version: "1.3.0"
+version: "2.0.4"
 summary: The Cloud-Native API Gateway
 base: core18
 description: |
@@ -157,15 +157,25 @@ parts:
       - etc/*
   openresty-kong-patches:
     plugin: dump
-    source: https://github.com/Kong/openresty-patches.git
-    source-depth: 1
+    # this used to be in https://github.com/Kong/openresty-patches but was
+    # moved recently to live in-tree with the build-tools
+    source: nil
+    source-type: local
+    override-pull:
+      # we have to manually git clone this because the repo is stupid and has a
+      # non-public submodule, which we cannot clone, and snapcraft always uses
+      # --recursive when cloning which will prompt for authentication
+      # see https://bugs.launchpad.net/snapcraft/+bug/1640675
+      # so we manually clone it without --recursive
+      git clone https://github.com/Kong/kong-build-tools.git $SNAPCRAFT_PART_SRC
     organize:
-      patches: openresty-kong-patches
+      openresty-patches/patches: openresty-kong-patches
     stage: [openresty-kong-patches]
     prime: [-*]
   lua-kong-nginx-module:
     source: https://github.com/Kong/lua-kong-nginx-module.git
-    source-tag: 0.0.4
+    # TODO: is this the right tag for this? it's just the newest, so ???
+    source-tag: 0.0.6
     plugin: nil
     override-build: |
       # install the static lualib dir into the final snap, the compiled parts
@@ -189,14 +199,14 @@ parts:
     # here
     after: [openresty-kong-patches, snapcraft-preload, lua-kong-nginx-module]
     plugin: autotools
-    source: https://openresty.org/download/openresty-1.15.8.1.tar.gz
+    source: https://openresty.org/download/openresty-1.15.8.2.tar.gz
     install-via: prefix
     # configure options here from https://getkong.org/install/source/
     configflags:
-      - --with-pcre-jit
       - --with-ipv6
-      - --with-http_realip_module
+      - --with-pcre-jit
       - --with-http_ssl_module
+      - --with-http_realip_module
       - --with-http_stub_status_module
       - --with-http_v2_module
       - --add-module=$SNAPCRAFT_STAGE/lua-kong-nginx-module
@@ -261,12 +271,11 @@ parts:
     after: [lua]
     plugin: autotools
     source: https://github.com/luarocks/luarocks.git
-    source-branch: v3.1.3
+    source-branch: v3.2.1
     source-depth: 1
     override-build: |
       ./configure \
         --prefix=$SNAPCRAFT_STAGE \
-        --lua-suffix=jit \
         --with-lua=$SNAPCRAFT_STAGE \
         --with-lua-include=$SNAPCRAFT_STAGE/luajit/include/luajit-2.1 \
         --lua-version=5.1
@@ -287,7 +296,7 @@ parts:
     after: [snapcraft-preload, luarocks]
     source: https://github.com/kong/kong.git
     plugin: nil
-    source-tag: 1.3.0
+    source-tag: 2.0.4
     source-depth: 1
     build-packages:
       - unzip
