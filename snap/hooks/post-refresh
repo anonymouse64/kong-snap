@@ -1,11 +1,4 @@
 #!/bin/bash -e
 
-if [ -e "$SNAP_DATA/disable-cassandra" ]; then
-    snapctl stop --disable "$SNAP_NAME.cassandra"
-fi
-
-# handle addition of postgres to the snap later, this is normally done inside 
-# the install hook, but since we used to not have postgres, the install hook 
-# that does this won't have copied these files over, so we also have to do this
-# here
-"$SNAP/bin/common-postgres-setup.sh"
+# empty for now, since we are on epoch 2 and we haven't published a epoch 2*
+# snap which would transition epoch 1 folks to epoch 2

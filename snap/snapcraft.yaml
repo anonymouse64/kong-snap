@@ -11,7 +11,8 @@ assumes: [snapd2.42]
 
 # epoch 0 is for the old 0.13.1 version of the snap with cassandra
 # epoch 1 is for the 1.3 version of the snap with both cassandra and postgres
-epoch: 1
+# epoch 2 is for 1.3+ version of the snap with just postgres
+epoch: 2
 
 grade: stable
 confinement: strict
@@ -55,7 +56,6 @@ apps:
     adapter: full
     after:
       - postgres
-      - cassandra
     command: bin/kong-daemon.sh
     command-chain:
       - bin/perl5lib-launch.sh
@@ -100,18 +100,6 @@ apps:
     plugs:
       - network
       - network-bind
-  cassandra:
-    command: bin/cassandra-wrapper.sh
-    daemon: forking
-    adapter: full
-    # mount-observe needs to be manually connected post-install:
-    # `sudo snap connect cassandra:mount-observe ubuntu-core:mount-observe`
-    plugs:
-      - network
-      - network-bind
-      # Needed for checking available space in the data directories
-      # (java.io.File.getTotalSpace).
-      - mount-observe
   psql:
     adapter: full
     command: usr/bin/psql
@@ -404,47 +392,3 @@ parts:
       - postgresql-contrib
       - postgresql-client
       - perl
-  cassandra:
-    plugin: dump
-    source: http://archive.apache.org/dist/cassandra/3.11.4/apache-cassandra-3.11.4-bin.tar.gz
-    source-type: tar
-    build-packages:
-      - ant-optional
-      - build-essential
-      - python
-      - sed
-    stage-packages:
-      # Copy some packages into the stage directory to steal their
-      # pre-built binaries.
-      - mawk
-      - grep
-      # For free(1)
-      - procps
-      - openjdk-8-jdk
-    organize:
-      # Rename directories into their expected locations. Analogous to
-      # Debian's .install files.
-      conf: etc/cassandra
-      bin/cassandra: usr/sbin/cassandra
-      lib: usr/share/cassandra/lib
-      # Rename mawk to awk instead of shipping a symlink.
-      usr/bin/mawk: usr/bin/awk
-    override-prime: |
-      snapcraftctl prime
-      # since we only use cassandra for kong, we severly limit the amount of 
-      # RAM that cassandra uses since it's a big of a RAM hog, by default
-      # attempting to use half of your RAM for itself...
-      echo "-Xms64M" >> $SNAPCRAFT_PART_INSTALL/etc/cassandra/jvm.options
-      echo "-Xmx256M" >> $SNAPCRAFT_PART_INSTALL/etc/cassandra/jvm.options
-      echo "-Xmn64M" >> $SNAPCRAFT_PART_INSTALL/etc/cassandra/jvm.options
-    prime:
-      # Files from the stage directory to include in the snap.
-      - bin/nodetool
-      - etc/cassandra
-      - usr/sbin/cassandra
-      - usr/share/cassandra/lib/*.jar
-      - usr/lib/jvm
-      # awk, grep, and free are needed by cassandra-env.sh
-      - usr/bin/awk
-      - bin/grep
-      - usr/bin/free
