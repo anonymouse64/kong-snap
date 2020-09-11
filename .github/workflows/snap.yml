@@ -30,6 +30,6 @@ jobs:
         run: |
           # wait a bit to make sure that we can ping kong
           sleep 10
-          snap services kong | grep kong-daemon | grep "enabled\s+active"
-          snap services kong | grep postgres | grep "enabled\s+active"
+          snap services kong | grep kong-daemon | grep -P "enabled\s+active"
+          snap services kong | grep postgres | grep -P "enabled\s+active"
           sudo kong health --prefix /var/snap/kong/current
