@@ -33,4 +33,3 @@ jobs:
           snap services kong | grep kong-daemon | grep "enabled\s+active"
           snap services kong | grep postgres | grep "enabled\s+active"
           sudo kong health --prefix /var/snap/kong/current
-          exit 1
