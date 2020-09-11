@@ -1,0 +1,16 @@
+name: Snap
+on: [push, pull_request]
+jobs:
+  build:
+    name: Snap building
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build the snap
+        uses: snapcore/action-build@v1
+      - name: Uploading kong snap artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: snap-files
+          path: "*.snap"
