@@ -18,13 +18,16 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-snap
     steps:
-      - name: testing snap install
+      - name: Download built snap
         uses: actions/download-artifact@v2
         with:
           name: snap-files
-      - shell: bash
+      - name: Install Built snap
+        shell: bash
+        run: sudo snap install --dangerous kong*.snap
+      - name: Verify snap services
+        shell: bash
         run: |
-          sudo snap install --dangerous kong*.snap
           # wait a bit to make sure that we can ping kong
           sleep 10
           snap services kong | grep kong-daemon | grep "enabled\s+active"
