@@ -1,5 +1,5 @@
 [![kong](https://snapcraft.io//kong/badge.svg)](https://snapcraft.io/kong)
-![Snap](https://github.com/anonymouse64/kong-snap/workflows/Snap/badge.svg)
+[![Snap](https://github.com/anonymouse64/kong-snap/workflows/Snap/badge.svg)](https://github.com/anonymouse64/kong-snap/actions?query=workflow%3ASnap)
 # Kong snap packaging
 
 [![snap store badge](https://raw.githubusercontent.com/snapcore/snap-store-badges/master/EN/%5BEN%5D-snap-store-black-uneditable.png)](https://snapcraft.io/kong)
