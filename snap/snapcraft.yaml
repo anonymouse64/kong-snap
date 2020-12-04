@@ -6,8 +6,9 @@ description: |
   Kong is a cloud-native, fast, scalable, and distributed Microservice Abstraction Layer (also known as an API Gateway, API Middleware or in some cases Service Mesh). Made available as an open-source project in 2015, its core values are high performance and extensibility.
 icon: snap/local/runtime-assets/kong-logo.png
 
-# for system-usernames we need snapd 2.42
-assumes: [snapd2.42]
+# system-usernames is snapd 2.42+
+# using setpriv for snap_daemon support is snapd 2.45+
+assumes: [snapd2.45]
 
 # epoch 0 is for the old 0.13.1 version of the snap with cassandra
 # epoch 1 is for the 1.3 version of the snap with both cassandra and postgres
@@ -95,7 +96,7 @@ apps:
       CONFIG_ARG: config_file=$SNAP_DATA/etc/postgresql/10/main/postgresql.conf
       SNAPCRAFT_PRELOAD_REDIRECT_ONLY_SHM: 1
     command-chain:
-      - bin/gosu-snap_daemon.sh
+      - bin/setpriv-snap_daemon.sh
       - bin/snapcraft-preload
     plugs:
       - network
@@ -109,7 +110,7 @@ apps:
       - bin/perl5lib-launch.sh
       # createuser should be run as the snap_daemon user, which is the user
       # who is initially created as a role with postgres
-      - bin/gosu-snap_daemon.sh
+      - bin/setpriv-snap_daemon.sh
     plugs:
       - network
   # same as psql app, but runs as any user, not snap_daemon
@@ -132,7 +133,7 @@ apps:
       - bin/perl5lib-launch.sh
       # createuser should be run as the snap_daemon user, which is the user
       # who is initially created as a role with postgres
-      - bin/gosu-snap_daemon.sh
+      - bin/setpriv-snap_daemon.sh
     plugs:
       - network
   createdb:
@@ -144,7 +145,7 @@ apps:
       - bin/perl5lib-launch.sh
       # createdb should be run as the snap_daemon user, which is the user
       # who is initially created as a role with postgres
-      - bin/gosu-snap_daemon.sh
+      - bin/setpriv-snap_daemon.sh
     plugs:
       - network
 
@@ -312,7 +313,7 @@ parts:
       - luarocks
       - lua5.1
       - libyaml-dev
-    override-pull : |
+    override-pull: |
       snapcraftctl pull
       cd $SNAPCRAFT_PART_SRC
       patch  < "$SNAPCRAFT_PROJECT_DIR/snap/local/patches/0002-lua-resty-openssl-fix.patch"
@@ -386,12 +387,6 @@ parts:
     stage-packages:
       - to amd64:
           - lib32stdc++6
-  gosu:
-    source: https://github.com/tianon/gosu.git
-    plugin: go
-    go-importpath: github.com/tianon/gosu
-    build-environment:
-      - CGO_ENABLED: "0"
   postgres:
     plugin: nil
     override-build: |
@@ -407,3 +402,4 @@ parts:
       - postgresql-contrib
       - postgresql-client
       - perl
+      - setpriv

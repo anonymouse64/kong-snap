@@ -22,7 +22,7 @@ mkdir -p "$SNAP_DATA/postgresql"
 chown -R snap_daemon:snap_daemon "$SNAP_DATA/postgresql" 
 
 # setup the postgres data directory
-gosu snap_daemon "$SNAP/usr/lib/postgresql/10/bin/initdb" -D "$SNAP_DATA/postgresql/10/main"
+$SNAP/bin/setpriv-snap_daemon.sh "$SNAP/usr/lib/postgresql/10/bin/initdb" -D "$SNAP_DATA/postgresql/10/main"
 
 # ensure the sockets dir exists and is properly owned
 mkdir -p "$SNAP_COMMON/sockets"
@@ -34,6 +34,6 @@ sleep 2
 
 # add a kong user and database in postgres - note we have to run these through
 # the perl5lib-launch scripts to setup env vars properly
-gosu snap_daemon "$SNAP/bin/perl5lib-launch.sh" "$SNAP/usr/bin/createuser" kong
-gosu snap_daemon "$SNAP/bin/perl5lib-launch.sh" "$SNAP/usr/bin/createdb" kong
+$SNAP/bin/setpriv-snap_daemon.sh "$SNAP/bin/perl5lib-launch.sh" "$SNAP/usr/bin/createuser" kong
+$SNAP/bin/setpriv-snap_daemon.sh "$SNAP/bin/perl5lib-launch.sh" "$SNAP/usr/bin/createdb" kong
 
